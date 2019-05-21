@@ -3,6 +3,11 @@
 # url is the full website URL
 # baseurl is the website's URL without the hostname
 
+# --- General options --- #
+
+# url is the full website URL
+# baseurl is the website's URL without the hostname
+
 # If you are building a simple GitHub user page (https://username.github.io) then use these settings:
 url: "https://username.github.io"
 baseurl: ""
@@ -14,11 +19,7 @@ baseurl: ""
 # Of course don't forget to change the username and projectname to YOUR username and project
 
 # Name of website
-<<<<<<< HEAD
 title: My website
-=======
-title:  Kyle Karber
->>>>>>> 20548d72a2248707aac94c9ca6d6b4ee94028be2
 
 # Short description of your site
 description: A virtual proof that name is awesome!
