@@ -14,7 +14,11 @@ baseurl: ""
 # Of course don't forget to change the username and projectname to YOUR username and project
 
 # Name of website
+<<<<<<< HEAD
 title: My website
+=======
+title:  Kyle Karber
+>>>>>>> 20548d72a2248707aac94c9ca6d6b4ee94028be2
 
 # Short description of your site
 description: A virtual proof that name is awesome!
