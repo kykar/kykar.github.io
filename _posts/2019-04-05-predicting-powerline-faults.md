@@ -1,7 +1,7 @@
 ---
 layout: post
 title: Predicting Faults in Power Transmission Lines
-subtitle: A Kaggle Competition
+subtitle: Kaggle competition
 ---
 
 The objective of this project was to identify partial discharges in medium voltage overhead power transmission lines. Partial discharges result from damage to the line that is not yet severe enough to cause a power outage, though left unrepaired it will lead to a power outage or start a fire.
