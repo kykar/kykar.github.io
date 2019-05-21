@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Predicting Failures of Drinking Water Wells in Tanzania
+title: Predicting Drinking Water Well Failures in Tanzania
 subtitle: A drivendata.org Competition
 ---
 
