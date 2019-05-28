@@ -35,7 +35,7 @@ There were a significant number of hierarchical features with overlapping levels
 
 I did not want to include all the features within a group in the model and feature selection process due to issues arising from their correlation, such as multicollinearity in the case of logistic regression. I made an inital selection of one variable from each group based on the number of unique levels (not too many or too few) and the number of waterpoints in each level; for example, if a certain feature had levels with less than 100 datapoints and that level was combined with another level in a different feature within the group, the less detailed feature was chosen.
 
-While some of the features were obviously correlated due to their hierarchical nature, other features needed to be tested for correlation. Since the features included a mix of numeric and categorical data, I used a custom function to calculate correlations. This function used Pearson's correlation for numeric pairs, chi-squared test for categorical pairs, and the linear regression correlation coefficient for numeric-categorical pairs. Features with correlation coefficients greater than |0.5| were not included in the model building process at the same time. Fortunately, there were very few feature pairs that exceeded this threshold.
+While some of the features were obviously correlated due to their hierarchical nature, other features needed to be tested for correlation. Since the features included a mix of numeric and categorical data, I used a custom function to calculate correlations. This function used Pearson's correlation for numeric pairs, chi-squared test for categorical pairs, and the linear regression correlation coefficient for numeric-categorical pairs. Features with correlation coefficients greater than \|0.5\| were not included in the model building process at the same time. Fortunately, there were very few feature pairs that exceeded this threshold.
 
 #### Model Evaluation
 
@@ -55,28 +55,28 @@ In order to select the best model for predicting waterpoint status, I followed t
 
 When comparing model performance I selected the most parsimonious (i.e. simplest) model that was within one standard error of the model with the best accuracy, which is a common rule of thumb (Hastie et al., 2009). I provide a brief overview of the candidate algorithms below.
 
-**Random Forest**
+**Random Forest**  
 A random forest classifier is the average of a "forest" of decision tree classifiers. Decision tree classifiers are essentially made up of nested `if-then` statements that aim to partition the data into smaller groups that contain a larger proportion of one class after each `if-then` statement. These classifiers are simple, interpretable, and can handle categorical and missing data, but they are very noisy and unstable (Kuhn & Johnson, 2018). Bagging (bootstrap aggregation) reduces the variance of decision trees by averaging many of them into an ensemble or "forest" (Hastie et al., 2009).
 
 The random forest further improves on the bagged trees by introducing randomness: a limited number of predictors/features are randomly sampled at each split/node in the tree. By introducing randomness, the trees are de-correlated and variance of the estimate is further reduced. Random forest is popular because it performs well, requires very little tuning, is robust to noisy features, provides estimates of variable importance, can handle missing data, and it rarely overfits the data. For more information on random forests, see (Hastie et al., 2009) pages 587-602 or (Kuhn & Johnson, 2018) pages 198-203.
 
-**XGBoost**
+**XGBoost**  
 Boosting is a relatively new technique whose theory and algorithms were developed in the 1980's and 1990's, respectively (Kuhn & Johnson, 2018). Boosting algorithms take many weak classifiers whose error rate is only slightly better than random guessing and combines them into a strong classifier (EoSL p.337). Decision trees are a good base learner for boosting because they can be made weak learners by restricting their depth and they are easily ensembled together.
 
 Gradient boosted trees have some basic similarities with random forests, but they have significant differences: in random forests the trees are independent, deep, and equally weighted in the ensemble, whereas with gradient boosting the trees are dependent on past trees, shallow, and unequally weighted in the ensemble. Gradient boosted trees and random forests offer similar predictive performance, but random forests are easier to tune and can be computed faster since parallel processing is straightforward due to the independent trees (Kuhn & Johnson, 2018). For more information on boosting, see (Kuhn & Johnson, 2018) pages 203-208 & 389-392).
 
 XGBoost is a newer variation on the gradient boosting technique and was originally released in 2014. XGBoost quickly gained popularity due to its winning performance in Kaggle machine learning competitions; of the 29 Kaggle challenge winning solutions in 2015, 17 solutions used XGBoost while the next most popular method was deep neural nets which were used in 11 solutions. This method is applicable to a wide range of problems, has a faster computation time than deep learning methods with similar performance in many instances. For more information on XGBoost, see (Chen & Guestrin, 2016).
 
-**Multinomial Logistic Regression**
+**Multinomial Logistic Regression**  
 Logistic regression is a simple and interpretable classification technique, but it is unlikely to perform as well as the previous two models. It is a variation on linear regression where the logit function, *l**o**g*(*p*/(1 − *p*)), is used to transform the continuous outcome variable to a probability distribution between 0 and 1 for a binary outcome variable. Multinomial logistic regression extends logistic regression to outcome variables with three or more classes. For more information on logistic regression, see (Hastie et al., 2009) pages 119-128 or (Kuhn & Johnson, 2018) pages 282-287.
 
-**k-Nearest Neighbors**
+**k-Nearest Neighbors**  
 The k-nearest neighbors (KNN) predicts the class of a sample based on the majority vote of the classes of the k-nearest datapoints. The nearest datapoints are determined by the Euclidian distance or another distance metric. Thus, features must be numeric or categorical variables that are able to be converted to numeric, and they must be centered and scaled if the units of any of the features are different. KNN is simple and has good performance on certain datasets (e.g. data with irregular decision boundary), but it is not interpretable for high-dimensional data, prone to overfitting with smaller k, can be unstable, and it does not take categorical features. For more information on KNN, see (Hastie et al., 2009) pages 463-468 or (Kuhn & Johnson, 2018) pages 350-353.
 
-**Ensemble Model**
+**Ensemble Model**  
 I created two ensemble models, which combine the predictions of the models above. The first was a simple majority vote ensemble model. In the event of a tie the prediction of the top performing model was selected, so only a unified dissenting vote could overrule the top model. The second ensemble was a stacked ensemble where the predictions from the four models above were used as input variables for fitting another random forest model.
 
-**Final Models**
+**Final Models**  
 These are the final models that I used to predict the target variable on the test set for submission to drivendata.org: the two best individual models above, the ensemble model, as well as the best model with the leaky predictors included (for comparison purposes).
 
 #### Feature Selection and Parameter Tuning
@@ -228,7 +228,7 @@ Results
 
 #### Random Forest
 
-**Recursive Feature Elimination**
+**Recursive Feature Elimination**  
 The results of the recursive feature elimination are shown in the figure below, with the error bars representing the 95% confidence interval in this and all other plots. There is a significant increase in accuracy as the number of variables included in the random forest model increases from 4 to 10. Though the 12 variable model has the highest accuracy, its accuracy is not significantly better than that of the 10 variable model. As such, I chose to use the 10 variable random forest model going forward.
 
 <img src="{{site_url}}/img/blog/wpc_report/rf_rfe-1.png" style="display: block; margin: auto;" />
@@ -237,12 +237,12 @@ The variable importance for the 12 variable model is shown in the figure below. 
 
 <img src="{{site_url}}/img/blog/wpc_report/rf_imp-1.png" style="display: block; margin: auto;" />
 
-**Parameter Tuning**
+**Parameter Tuning**  
 The RFE results above were obtained with the defualt of $mtry = sqrt(\# of variables) = 3`, which is the number of variables randomly sampled at each node, and with`ntrees=500`. I used a search grid of`mtry=c(2,3,4,5)`. For 2 and 5 accuracy was slightly reduced, but was essentially the same for 3 and 4, and not significantly different for any value of`mtry`, so I kept it at 3. I used values of`ntrees=c(51,101,201,301,501)`. Similarly, There was not a significant difference for any value of`ntrees`, but there was a slight upward trend. I chose`ntrees=201\` even though it had lower accuracy compared to 101 or 301, as that dip is likely due to variance, and 201 should provide an adequate number of trees with a faster compute time than larger forests. Overall, you can see that these parameters have very little effect on the accuracy.
 
 <img src="{{site_url}}/img/blog/wpc_report/rf_mtry_trees-1.png" style="display: block; margin: auto;" />
 
-**Variable Substitutions**
+**Variable Substitutions**  
 After establishing the 10-variable baseline, I substituted grouped variables for one another to see if further improvements in accuracy were possible. The figure below compares the accuracy of these variable substitutions.
 
 <img src="{{site_url}}/img/blog/wpc_report/rf_tests-1.png" style="display: block; margin: auto;" />
@@ -251,7 +251,7 @@ For the "ext" substitution, I replaced `extraction_type_group` with `extraction_
 
 Though none of the substitutions resulted in a statistically significant improvement in accuracy, adding `funder20` and substituting `pop_log` for `pop_log3` showed promise. I made both of these changes for the "final" model, which showed a significant improvement over the "baseline"model, which is shown in the data leakage figure below.
 
-**Data Leakage**
+**Data Leakage**  
 The accuracy of the baseline, final (with 200 and 500 trees), and leaky predictor models are compared in the figure below. The final model is significantly better than the baseline model, but there is not a difference between the final model with 200 trees or 500 trees. Including the suspected leaky predictors, `quantity` and `water_quality`, significantly improves the model performance as expected. According to the mean decrease in the Gini coefficient, quantity becomes the most important variable in the leaky model while quality is the least important. This confirms that quantity is likely to be a leaky predictor, and quality may not be a leaky predictor but it also isn't a very useful predictor.
 
 <img src="{{site_url}}/img/blog/wpc_report/rf_leak-1.png" style="display: block; margin: auto;" />
