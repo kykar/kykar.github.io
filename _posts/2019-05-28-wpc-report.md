@@ -85,7 +85,7 @@ I reduced the number of potential features using the methods outlined in the Dat
 
 I worked to select only the most predictive features in order to have a simpler more parsimonious model, even though Random forest and XGBoost essentially have feature selection built in, i.e. unimportant predictors are (usually) automatically not included in the tree building process. To select the most important features I used recursive feature elimination, using the `rfe()` function in the `caret` package, which employs the algorithm in the figure below, copied from (Kuhn, 2019).
 
-![](../images/rfe_algo.png)
+<img src="{{site_url}}/img/blog/wpc_report/rfe_algo-1.png" style="display: block; margin: auto;" />
 
 For each of the features that belonged to a group and remained after the recursive feature selection process, I substituted the other variables within the feature group one-by-one and reevaluated the model performance. Of the grouped features, I selected the simplest feature that didn't negatively impact model accuracy.
 
@@ -104,7 +104,7 @@ There were a number of features that were either redundant or their meaning was 
 
 There were eight features describing the waterpoint location (`latitude`, `longitude`, `subvillage`, `ward`, `lga`, `region`, `region_code`, and `district_code`) and three features related to location (`population`, `altitude`, `basin`). Subvillage, ward, lga, region, and district are all geographic subdivisions, from smallest to largest. Although region is a subdivision of district in reality, there are more unique regions codes (27) than district codes (20). Additionally, the number of unique region names (21) is smaller than the number of regions codes. Because of these discrepancies, I decided to use the latitude and longitude location features in all the models except the logistic regression. I included `lga` as the location variable for the logistic regression, since it is very unlikely that waterpoint status would be linearly dependent on GPS coordinates. About 3% of the longitude data is missing (zeros), but none of the latitude data is missing. The latitude longitude coordinates of the waterpoints colored by functionality are shown in the figure below.
 
-<img src="{{site_url}}/img/blog/map-1.png" style="display: block; margin: auto;" />
+<img src="{{site_url}}/img/blog/wpc_report/map-1.png" style="display: block; margin: auto;" />
 
 Nearly half of the population data was missing (recorded as zeros or ones), so I tried two different imputation methods. The first simply imputed the median population of the region (`region_code`) where the waterpoint is located. However, because of the large amount of missing population data, about one-fourth of the regions had a median population of zero. Thus, even after imputation, about one-third of the population data was still zero.
 
@@ -116,13 +116,13 @@ Since missing numerical data is recorded as zeros in this dataset, we cannot dif
 
 The dataset includes information on who funded the well (`funder`) and who installed it (`installer`). There were 1898 unique funders and 2146 unique installers recorded. However, they were not truely unique as the same funder/installer was sometimes recorded under different names. For example, "Government", "Gover", "GOVER", "Govt", "Central government." I first converted all levels to lowercase strings, then identified the government related levels with the regex `"(gov)|(dist)|(coun)"`. I then examined the strings with the detected pattern and developed a regex to exclude misidentified strings, `"(village)|(comm)|(china)|(belgian)|(finland)|(irish)|(ital)|(japan)|(iran)|(egypt)|(methodist)"`. I similarly identified community/village funders and installers with the regex `"(comm)|(vill)"`, while excluding `"(committe)|(bank)"`. I retained the top 10 and 20 funders and installers, and changed the rest to "other." There is significant overlap between the top funders and installers. The figure below shows the top 10 installers broken down by waterpoint condition.
 
-<img src="{{site_url}}/img/blog/installer-1.png" style="display: block; margin: auto;" />
+<img src="{{site_url}}/img/blog/wpc_report/installer-1.png" style="display: block; margin: auto;" />
 
 #### Waterpoint Features
 
 There are a number of waterpoint features in this dataset, including the construction year, permit, water source, extraction type, waterpoint type, and water quality. A little over one-third of the construction year data was missing. In the furure I will impute missing construction year data. The figure below shows the construction year data broken down by functionality.
 
-<img src="wpc_report_files/figure-markdown_github/construction_year-1.png" style="display: block; margin: auto;" />
+<img src="{{site_url}}/img/blog/wpc_report/construction_year-1.png" style="display: block; margin: auto;" />
 
 I created a new variable, `years_op` (i.e. years operational), that was the time elapsed between the construction year and the year this data was recorded, since it was recorded over an 11 year timeframe. This was intended to help narrow down the number of years that the waterpoint was operational, but since we do not have data on the actual year of failure this is a source of uncertainty. This new variable made it possible to predict which wells have failed since the data was recorded, by adding the number of years elapsed since the data was recorded to `years_op` and re-running the model. In addition to giving updated predictions on waterpoint failures, tweaking this variable and re-running the model will validate the stability and usefullness of the model: I expect that the number of non-functional waterpoints will increase and waterpoints previously predicted to be non-functional should not change to functional when `years_op` is increased.
 
@@ -191,15 +191,15 @@ unknown
 </table>
 The next waterpoint feature group was the water source, which included `source`, `source_type`, and `source_class`, with 10, 7, and 3 unique levels respectively. My inital selection was `source_type`, but the more detailed `source` variable is broken down by functional status in the figure below.
 
-<img src="{{site_url}}/img/blog/source-1.png" style="display: block; margin: auto;" />
+<img src="{{site_url}}/img/blog/wpc_report/source-1.png" style="display: block; margin: auto;" />
 
 Another waterpoint feature group was the extraction type, meaning the method of extracting water from the water source. This group included `extraction_type`, `extraction_type_class`, and `extraction_type_group`, with 18, 13, and 7 unique levels, respectively. My inital selection was `extraction_type_class`, which is broken down by functional status in the figure below.
 
-<img src="wpc_report_files/figure-markdown_github/extraction_type-1.png" style="display: block; margin: auto;" />
+<img src="{{site_url}}/img/blog/wpc_report/extraction_type-1.png" style="display: block; margin: auto;" />
 
 The next waterpoint feature group was the waterpoint type, meaning the method of dispensing the water. This group included `waterpoint_type` and `waterpoint_type_group`. The only difference was that the latter combined "community standpipe" with "community standpipe multiple." The `waterpoint_type` was the feature that I initally selected in this group, and it is shown broken down by status group in the figure below.
 
-<img src="{{site_url}}/img/blog/waterpoint_type-1.png" style="display: block; margin: auto;" />
+<img src="{{site_url}}/img/blog/wpc_report/waterpoint_type-1.png" style="display: block; margin: auto;" />
 
 Additionally, two feature groups were flagged as data leakage, meaning they provide information that would not realistically be available at the time of prediction. The first "leaky" feature group is `quantity` and `quantity_group`. These features qualitatively reveal how much water flows from the waterpoint. In order to obtain quantity data one would also observe the functional status of the well. For example, waterpoints with quantity of "dry" are almost entirely non-functional. Presumably, when making new predictions in the future, quantity data would not be available for waterpoints with an unknown functional status. As such, I have developed my models without the quantity features. For comparison purposes, I added `quantity` to my final model to see how much this leaky predictor improves model accuracy.
 
@@ -209,7 +209,7 @@ The second leaky feature group is water quality, including `water_quality` and `
 
 There are two related payment features in the dataset: payment amount in Tanzanian Shillings (`amount_tsh`) and the type or frequency of payment (`payment_type`), which could be by the bucket, monthly, or yearly for example. At first glance it appeared that 70% of the `amount_tsh` data was missing (recorded as zeros) but when accounting for plausible zeros in the `payment_type` categories of "never pay," "unknown," and "on failure," less than 10% of the data appeared to be erroniously recorded as zero. A smoothed histogram of non-zero payment amounts in Tanzanian Shillings (Tsh) broken down by payment type is shown below. Note that one US dollar was equivalent to about 1,500 Tsh around the time most of these data were recorded.
 
-<img src="{{site_url}}/img/blog/amount_tsh2-1.png" style="display: block; margin: auto;" />
+<img src="{{site_url}}/img/blog/wpc_report/amount_tsh2-1.png" style="display: block; margin: auto;" />
 
 The median payment per bucket was 20 Tsh (~$0.01), the median monthly payment was 300 Tsh (~$0.20), and the median annual payment was 2000 Tsh (~$1.33). Thus, the relationship between payment amount and payment type is as one might expect. The log<sub>10</sub> transform of non-zero values of `amount_tsh` were saved as a new feature (`amount_log`) because its distribution was closer to normal (zeros were retained).
 
@@ -221,7 +221,7 @@ There were three management related features which were assumed to represents wh
 
 The figure below shows the correlation matrix for the 13 variables initally selected for modeling, none of which exceed an absolute correlation coefficient of 0.5. The full correlation matrix is not shown because it would be too large, and correlation of the grouped variables is expected. The following variables were not included in the inital model due to correlation coeffieients in excess of 0.5: `amount_log` (*r* = 0.78 with `payment_type`) and `scheme_management` (*r* = 0.73 with `management`). Additionally, the transformed variable `years_op` proved useful because the variable it was created from, `construction_year`, was correlated with `pop_log` (*r* = 0.90) and `gps_height` (*r* = 0.66). The grouped variables were highly correlation, as expected.
 
-<img src="{{site_url}}/img/blog/corr-1.png" style="display: block; margin: auto;" />
+<img src="{{site_url}}/img/blog/wpc_report/corr-1.png" style="display: block; margin: auto;" />
 
 Results
 -------
@@ -231,21 +231,21 @@ Results
 **Recursive Feature Elimination**
 The results of the recursive feature elimination are shown in the figure below, with the error bars representing the 95% confidence interval in this and all other plots. There is a significant increase in accuracy as the number of variables included in the random forest model increases from 4 to 10. Though the 12 variable model has the highest accuracy, its accuracy is not significantly better than that of the 10 variable model. As such, I chose to use the 10 variable random forest model going forward.
 
-<img src="{{site_url}}/img/blog/rf_rfe-1.png" style="display: block; margin: auto;" />
+<img src="{{site_url}}/img/blog/wpc_report/rf_rfe-1.png" style="display: block; margin: auto;" />
 
 The variable importance for the 12 variable model is shown in the figure below. `permit` and `source_type` were removed for the 10 variable random forest model.
 
-<img src="{{site_url}}/img/blog/rf_imp-1.png" style="display: block; margin: auto;" />
+<img src="{{site_url}}/img/blog/wpc_report/rf_imp-1.png" style="display: block; margin: auto;" />
 
 **Parameter Tuning**
 The RFE results above were obtained with the defualt of $mtry = sqrt(\# of variables) = 3`, which is the number of variables randomly sampled at each node, and with`ntrees=500`. I used a search grid of`mtry=c(2,3,4,5)`. For 2 and 5 accuracy was slightly reduced, but was essentially the same for 3 and 4, and not significantly different for any value of`mtry`, so I kept it at 3. I used values of`ntrees=c(51,101,201,301,501)`. Similarly, There was not a significant difference for any value of`ntrees`, but there was a slight upward trend. I chose`ntrees=201\` even though it had lower accuracy compared to 101 or 301, as that dip is likely due to variance, and 201 should provide an adequate number of trees with a faster compute time than larger forests. Overall, you can see that these parameters have very little effect on the accuracy.
 
-<img src="{{site_url}}/img/blog/rf_mtry_trees-1.png" style="display: block; margin: auto;" />
+<img src="{{site_url}}/img/blog/wpc_report/rf_mtry_trees-1.png" style="display: block; margin: auto;" />
 
 **Variable Substitutions**
 After establishing the 10-variable baseline, I substituted grouped variables for one another to see if further improvements in accuracy were possible. The figure below compares the accuracy of these variable substitutions.
 
-<img src="{{site_url}}/img/blog/rf_tests-1.png" style="display: block; margin: auto;" />
+<img src="{{site_url}}/img/blog/wpc_report/rf_tests-1.png" style="display: block; margin: auto;" />
 
 For the "ext" substitution, I replaced `extraction_type_group` with `extraction_type_class`, which resulted in a nearly significant decrease in accuracy. For "fund" I added `funder20`, which slightly improved accuracy. For the "inst" substitution, I replaced `install20` with `install10`, which did not affect accuracy. For the "man" substitution, I replaced `management` with `management_group` or `scheme_management`, neither of which affected accuracy. For the "pay" substitution, I replaced `payment_type` with `amount_log`, which significantly reduced accuracy. For the "pop" substitution, I replaced `pop_log3` with `pop_log`, which improved accuracy by an almost significant amount. For the "pop2" substitution, I replaced `pop_log3` with `pop_log2`, which also improved accuracy. For the "year" substitution, I replaced `years_op` for `construction_year`, which had a negligible increase in accuracy.
 
@@ -254,13 +254,13 @@ Though none of the substitutions resulted in a statistically significant improve
 **Data Leakage**
 The accuracy of the baseline, final (with 200 and 500 trees), and leaky predictor models are compared in the figure below. The final model is significantly better than the baseline model, but there is not a difference between the final model with 200 trees or 500 trees. Including the suspected leaky predictors, `quantity` and `water_quality`, significantly improves the model performance as expected. According to the mean decrease in the Gini coefficient, quantity becomes the most important variable in the leaky model while quality is the least important. This confirms that quantity is likely to be a leaky predictor, and quality may not be a leaky predictor but it also isn't a very useful predictor.
 
-<img src="{{site_url}}/img/blog/rf_leak-1.png" style="display: block; margin: auto;" />
+<img src="{{site_url}}/img/blog/wpc_report/rf_leak-1.png" style="display: block; margin: auto;" />
 
 #### All Model Comparison
 
 I focused on the random forest model in terms of the analysis and presenting the results above because it had higher accuracy than the other models; I only provide a brief overview of the other model results in comparison to the random forest results, as well as the final submission results in this section. In the figure below I show the accuracy for the final random forest (rf), random forest with leaky predictors (leak), XGBoost (xgb), multinomial logistic regression (multinom), k-nearest neighbors (knn), majority vote ensemble (vote), and stacked ranfom forest ensemble (stack) models. The 10-fold cross validation accuracy estimates with 95% confidence intervals are represented by blue dots, while the test set accuracy of the final submissions are represented by red dots.
 
-<img src="{{site_url}}/img/blog/all_models-1.png" style="display: block; margin: auto;" />
+<img src="{{site_url}}/img/blog/wpc_report/all_models-1.png" style="display: block; margin: auto;" />
 
 Of the individual models without leaky predictors, the random forest had the highest CV-estimated accuracy. In fact, the individual random forest model had better accuracy on the test set than either of the ensemble models, though the stacked random forest ensemble was within one ten-thousandth of the individual random forest, at 0.7800 and 0.7801 respectively. The random forest model with the leaky predictors had the best performance overall, at 0.8125 accuracy on the test set. This is within 2% of the best performing submission to the drivendata.org competition, which has an accuracy of 0.8286. The test set accuracy is within the confidence interval for the random forest and XGBoost models, and just above it for the model with leaky predictors.
 
@@ -268,7 +268,7 @@ The XGBoost model was the next best individual model with a test set accuracy of
 
 Because of the consequences resulting from a lack of potable water, it is more important to identify wells that require repair than to identify (or misidentify) functioning wells. Thus, the sensitivity (a.k.a. recall or true positive rate) for predicting non-functional wells is an important model characteristic. The random forest model has a sensitivity of 0.72 for non-functional and 0.87 for functional, thus it is better at predicting functional wells, which is not ideal. The ROC curve for non-functional is shown in the figure below, with the red dot representing the current model sensitivity VS specificity.
 
-<img src="{{site_url}}/img/blog/roc-1.png" style="display: block; margin: auto;" />
+<img src="{{site_url}}/img/blog/wpc_report/roc-1.png" style="display: block; margin: auto;" />
 
 Similarly, the XGBoost model has a sensitivity of 0.69 for non-functional and 0.87 for functional, so it is slightly worse at predicting non-functional wells. In the future I could change the prediction cutoff values to a value that increases sensitivity while maintaining an acceptable number of false positives. It is also worth noting that neither the random forest nor the XGBoost models predicted "functional, needs repair" waterpoints with a sensitivity above 0.30, due to the significant class imbalance. In the future I can take steps to address the class imbalance or simply combine this class with one of the others.
 
