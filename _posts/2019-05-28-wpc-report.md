@@ -18,7 +18,7 @@ Efforts to increase access to clean drinking water are impeded by frequent water
 
 The data for this project were sourced from Taarifa and the Tanzanian ministry of Water, and provided by drivendata.org for one of their data science competitions. The data consists of 59,400 waterpoints/observations in the training set (waterpoint status known/labeled) and 14,850 observations in the test set (waterpoint status unlabeled). The dataset consists of 40 variables (features) not including the waterpoint status (target variable). These features are described in further detail in the Exploratory Data Analysis section. The status of waterpoints in the training set is shown in the figure below. 54% of the waterpoints were functional, 38% were non-functional, and 8% were functional but in need of repair.
 
-<img src="wpc_report_files/figure-markdown_github/status_group-1.png" style="display: block; margin: auto;" />
+<img src="{{site_url}}/img/blog/wpc_report/status_group-1.png" style="display: block; margin: auto;" />
 
 The main steps I performed included data exploration, feature engineering, fitting several different models (random forest, XGBoost, multinomial logistic regression, and k-nearest neighbors), cross validation, down selecting features, tuning model parameters, and creating ensemble models. More details are provided in the Methods section below, which is followed by the Exploratory Data Analysis, Results, and Conclusion sections.
 
@@ -238,7 +238,7 @@ The variable importance for the 12 variable model is shown in the figure below. 
 <img src="{{site_url}}/img/blog/wpc_report/rf_imp-1.png" style="display: block; margin: auto;" />
 
 **Parameter Tuning**  
-The RFE results above were obtained with the defualt of $mtry = sqrt(\# of variables) = 3`, which is the number of variables randomly sampled at each node, and with`ntrees=500`. I used a search grid of`mtry=c(2,3,4,5)`. For 2 and 5 accuracy was slightly reduced, but was essentially the same for 3 and 4, and not significantly different for any value of`mtry`, so I kept it at 3. I used values of`ntrees=c(51,101,201,301,501)`. Similarly, There was not a significant difference for any value of`ntrees`, but there was a slight upward trend. I chose`ntrees=201\` even though it had lower accuracy compared to 101 or 301, as that dip is likely due to variance, and 201 should provide an adequate number of trees with a faster compute time than larger forests. Overall, you can see that these parameters have very little effect on the accuracy.
+The RFE results above were obtained with the defualt of `mtry` = sqrt(\# of variables) = 3, which is the number of variables randomly sampled at each node, and with`ntrees=500`. I used a search grid of `mtry=c(2,3,4,5)`. For 2 and 5 accuracy was slightly reduced, but was essentially the same for 3 and 4, and not significantly different for any value of`mtry`, so I kept it at 3. I used values of `ntrees=c(51,101,201,301,501)`. Similarly, There was not a significant difference for any value of`ntrees`, but there was a slight upward trend. I chose `ntrees=201` even though it had lower accuracy compared to 101 or 301, as that dip is likely due to variance, and 201 should provide an adequate number of trees with a faster compute time than larger forests. Overall, you can see that these parameters have very little effect on the accuracy.
 
 <img src="{{site_url}}/img/blog/wpc_report/rf_mtry_trees-1.png" style="display: block; margin: auto;" />
 
