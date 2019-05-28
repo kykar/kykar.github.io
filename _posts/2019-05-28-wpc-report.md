@@ -1,3 +1,9 @@
+---
+layout: post
+title: Predicting Drinking Water Well Failures in Tanzania
+subtitle: Full Report
+---
+
 Abstract
 --------
 
